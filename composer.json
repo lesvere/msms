@@ -1,0 +1,24 @@
+{
+    "name": "lesvere/msms",
+    "description": "Simple muti-sms gateway package for sending short text messages from your Application.Facade for Laravel 5.Currently supported Gateways Alidayu, Webpower /Any HTTP/s based Gateways are supported by Custom Gateway. Log gateway can be used for testing.",
+    "license": "MIT",
+    "keywords": ["lesvere","sms", "msms", "alidayu","webpower","Custom Sms","sms gateway"],
+    "authors": [
+        {
+            "name": "lesvere",
+            "email": "lesvere@live.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "~5.0|~6.0",
+        "guzzlehttp/guzzle": "~5.0|~6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lesvere\\Msms\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
