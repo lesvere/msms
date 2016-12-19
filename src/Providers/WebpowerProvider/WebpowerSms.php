@@ -14,9 +14,24 @@ use GuzzleHttp\Client;
 class WebpowerSms
 {
     /**
-     * @var array $config
+     * @var string $account
      */
-    private $config;
+    private $account;
+
+    /**
+     * @var string $password
+     */
+    private $password;
+
+    /**
+     * @var string $content
+     */
+    private $content;
+
+    /**
+     * @var string $mobile
+     */
+    private $mobile;
 
     /**
      * @var $httpClient Client
@@ -33,15 +48,33 @@ class WebpowerSms
      */
     public function __construct($config, $client)
     {
-        $this->config     = $config;
+        $this->account  = $config['account'];
+        $this->password = $config['password'];
+//        $this->campaignID = $config['campaignID'];
         $this->httpClient = $client;
     }
 
-    public function send()
+    public function send($param)
     {
-        $response = $this->httpClient->request('POST', $this->url, $this->_getQueryBody($param));
+        $this->mobile  = $param['mobile'];
+        $this->content = $param['content'];
 
-        return $response->getBody();
+        $ci      = curl_init();
+        $options = array(
+            "Content-Type: application/json",
+            "X-HTTP-Method-Override: POST",
+            "Authorization: Basic " . base64_encode($this->account . ":" . $this->password)
+        );
+        curl_setopt($ci, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ci, CURLOPT_HTTPHEADER, $options);
+        curl_setopt($ci, CURLOPT_POSTFIELDS, json_encode(['mobile' => $this->mobile,'content' => $this->content]));
+        curl_setopt($ci, CURLOPT_URL, $this->url);
+        $response = curl_exec($ci);
+        curl_close($ci);
+        return $response;
+
+//        $response = $this->httpClient->post($this->url, $this->_getQueryBody());
+//        return $response->getBody();
     }
 
     /**
@@ -50,17 +83,18 @@ class WebpowerSms
      * @param array $param
      * @return array
      */
-    private function _getQueryBody($param)
+    private function _getQueryBody()
     {
-        $config = config('msms.webpower');
-        $code   = base64_encode($config['account'] . ':' . $this->config['password']);
-
         return [
-            'headers' => [
-                'Content-Type'  => 'application/json',
-                'Authorization' => 'Basic ' . $code,
+            'headers'     => [
+                "Content-Type: application/json",
+                "X-HTTP-Method-Override: POST",
+                'Authorization' => 'Basic ' . base64_encode($this->account . ':' . $this->password),
             ],
-            'query'   => array_merge($this->config, $param)
+            'form_params' => [
+                'mobile'  => $this->mobile,
+                'content' => $this->content,
+            ],
         ];
     }
 }
